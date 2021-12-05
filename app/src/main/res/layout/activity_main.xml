@@ -24,37 +24,19 @@
             android:id="@+id/drawing_view"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_weight="1"
+            android:layout_weight="6"
             android:background="#80FFFFFF" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/ear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Ecouter" />
-
-            <EditText
-                android:id="@+id/editTextTextPersonName2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:minHeight="48dp"
-                android:text="Name" />
-
-            <Button
-                android:id="@+id/copy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Copier" />
-
+            <TextView
+                android:id="@+id/panel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
         </LinearLayout>
 
     </LinearLayout>

@@ -2,45 +2,62 @@ package com.example.dinawrite;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Bundle;
-import android.text.TextPaint;
-import android.util.TypedValue;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import com.google.mlkit.vision.digitalink.Ink;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
     myCanvas myCanvas;
-    private Button translate;
+    TextView panel;
+    Boolean lock;
+    float xPoint;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        myCanvas = new myCanvas(this,null);
+        //myCanvas = new myCanvas(this,null);
         setContentView(R.layout.activity_main);
-        translate = findViewById(R.id.ear);
+        panel = (TextView) findViewById(R.id.panel);
+        lock = false;
 
-        translate.setOnClickListener(this);
+        panel.setOnTouchListener(this);
 
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        return false;
-    }
+        if (v == this.panel) {
+            float xPos = event.getX();
+            float yPos = event.getY();
+            if (this.lock == false) {
+                this.xPoint = xPos;
+                this.lock = true;
+            }
 
-    @Override
-    public void onClick(View view) {
-        if (view == this.translate) {
-            myCanvas.recognizeScreen();
+            int action = event.getAction();
+
+            switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_MOVE:
+                    break;
+                case MotionEvent.ACTION_UP:
+                    Log.i("yPoint",String.valueOf(this.xPoint));
+                    this.lock = false;
+                    if (xPoint> xPos) {
+                        myCanvas = findViewById(R.id.drawing_view);
+                        myCanvas.clearScreen();
+                    }else if (xPoint < xPos) {
+                        myCanvas = findViewById(R.id.drawing_view);
+                        myCanvas.recognizeScreen();
+                        myCanvas.clearScreen();
+
+                    }
+            }
         }
+        return true;
     }
 }

@@ -7,11 +7,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.mlkit.common.MlKitException;
 import com.google.mlkit.common.model.DownloadConditions;
 import com.google.mlkit.common.model.RemoteModelManager;
@@ -22,15 +25,26 @@ import com.google.mlkit.vision.digitalink.DigitalInkRecognizer;
 import com.google.mlkit.vision.digitalink.DigitalInkRecognizerOptions;
 import com.google.mlkit.vision.digitalink.Ink;
 
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 public class myCanvas extends View {
     Paint paint;
     Path path;
     public Ink.Builder inkBuilder = Ink.builder();
     public Ink.Stroke.Builder strokeBuilder;
     public DigitalInkRecognitionModel model;
-    public DigitalInkRecognitionModelIdentifier modelIdentifier;
     public DigitalInkRecognizer recognizer;
+    public TextToSpeech textToSpeech;
+    public RemoteModelManager remoteModelManager;
+    DigitalInkRecognitionModelIdentifier modelIdentifier;
 
+    // check si on a téléchargé le model
+    public Task<Boolean> checkIsDownload;
+
+    public myCanvas(Context context){
+        this(context, null);
+    }
     public myCanvas(Context context, AttributeSet attrs) {
         super(context,attrs);
         paint = new Paint();
@@ -42,32 +56,63 @@ public class myCanvas extends View {
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeWidth(5f);
-
         strokeBuilder = Ink.Stroke.builder();
 
-        // Specify the recognition model for a language
+
         try {
             modelIdentifier =
                     DigitalInkRecognitionModelIdentifier.fromLanguageTag("fr-FR");
         } catch (MlKitException e) {
-             Log.e(TAG, "Error  " + e);
-            // language tag failed to parse, handle error.
+            Log.e(TAG, "Error  ");
+        }
+        if (modelIdentifier == null) {
+            Log.e(TAG, "Error  ");
         }
 
-        assert modelIdentifier != null;
+        remoteModelManager = RemoteModelManager.getInstance();
         model = DigitalInkRecognitionModel.builder(modelIdentifier).build();
-        RemoteModelManager remoteModelManager = RemoteModelManager.getInstance();
+        checkIsDownload = remoteModelManager.isModelDownloaded(model);
+        checkIfModelIfDownloaded();
 
-        remoteModelManager
-                .download(model, new DownloadConditions.Builder().build())
-                .addOnSuccessListener(aVoid -> Log.i(TAG, "Model downloaded"))
-                .addOnFailureListener(
-                        e -> Log.e(TAG, "Error while downloading a model: " + e));
 
         // Get a recognizer for the language
-        recognizer = DigitalInkRecognition.getClient(
+        recognizer =
+                DigitalInkRecognition.getClient(
                         DigitalInkRecognizerOptions.builder(model).build());
 
+        // Notre syntéthiseur vocal
+        textToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status!= TextToSpeech.ERROR){
+                    textToSpeech.setLanguage(Locale.FRANCE);
+                }
+            }
+        });
+
+    }
+
+
+
+    public void checkIfModelIfDownloaded(){
+        checkIsDownload.addOnSuccessListener(
+                i -> Log.i(TAG, "Déjà téléchargé"))
+                .addOnFailureListener(
+                        aVoid -> {
+                            downloadModel();
+
+                        }
+                        );
+
+    }
+
+    /// Méthode qui check si on possède un model
+    public void downloadModel(){
+        this.remoteModelManager
+                .download(model, new DownloadConditions.Builder().build())
+                .addOnSuccessListener(aVoid -> Log.i(TAG, "Model téléchargé"))
+                .addOnFailureListener(
+                        e -> Log.e(TAG, "Erreur durant le téléchargement du model" + e));
     }
 
     @Override
@@ -94,7 +139,7 @@ public class myCanvas extends View {
             default:
                 return false;
         }
-        this.addNewTouchEvent(event);
+        addNewTouchEvent(event);
         invalidate();
         return true;
     }
@@ -103,34 +148,48 @@ public class myCanvas extends View {
         float x = event.getX();
         float y = event.getY();
         long t = System.currentTimeMillis();
+        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds((t));
 
-        // If your setup does not provide timing information, you can omit the
-        // third paramater (t) in the calls to Ink.Point.create
+
         int action = event.getActionMasked();
         switch (action) {
+            // Lorsqu'on écrit à la main on ajoute les coordonnées des points du texte
+            // à notre strokeBuilder
             case MotionEvent.ACTION_DOWN:
+                strokeBuilder.addPoint(Ink.Point.create(x, y, t));
+                break;
             case MotionEvent.ACTION_MOVE:
-                this.strokeBuilder.addPoint(Ink.Point.create(x, y, t));
+                strokeBuilder.addPoint(Ink.Point.create(x, y, t));
                 break;
             case MotionEvent.ACTION_UP:
+                // Lorsque l'utilisateur va enlever son doigt de l'écran, on appelle nos
+                // méthodes qui vont reconnaitre le
                 this.strokeBuilder.addPoint(Ink.Point.create(x, y, t));
-                this.inkBuilder.addStroke(this.strokeBuilder.build());
-                recognizeScreen();
-                this.path.reset();
-                this.inkBuilder = Ink.builder();
-                this.strokeBuilder = Ink.Stroke.builder();
                 break;
         }
     }
-
+    // On efface l'écran
+    public void clearScreen(){
+        path.reset();
+        inkBuilder = Ink.builder();
+        strokeBuilder = Ink.Stroke.builder();
+    }
     public void recognizeScreen(){
+        this.inkBuilder.addStroke(this.strokeBuilder.build());
         // This is what to send to the recognizer.
         Ink ink = inkBuilder.build();
-        recognizer.recognize(ink)
+        this.recognizer.recognize(ink)
                 .addOnSuccessListener(
                         // `result` contains the recognizer's answers as a RecognitionResult.
                         // Logs the text from the top candidate.
-                        result -> Log.i(TAG, result.getCandidates().get(0).getText()))
+
+                        result -> {
+                            Log.i(TAG, result.getCandidates().get(0).getText(),null);
+
+                            String text = result.getCandidates().get(0).getText();
+                            this.textToSpeech.speak(text,TextToSpeech.QUEUE_FLUSH,null);
+                        })
+
                 .addOnFailureListener(
                         e -> Log.e(TAG, "Error during recognition: " + e));
     }

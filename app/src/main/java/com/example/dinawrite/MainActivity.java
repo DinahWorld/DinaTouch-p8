@@ -2,62 +2,36 @@ package com.example.dinawrite;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Canvas;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
-    myCanvas myCanvas;
-    TextView panel;
-    Boolean lock;
-    float xPoint;
-
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    Button voice;
+    Button game;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //myCanvas = new myCanvas(this,null);
-        setContentView(R.layout.activity_main);
-        panel = (TextView) findViewById(R.id.panel);
-        lock = false;
-
-        panel.setOnTouchListener(this);
+        setContentView(R.layout.main_activity);
+        voice = findViewById(R.id.voice);
+        game = findViewById(R.id.game);
+        voice.setOnClickListener(this);
+        game.setOnClickListener(this);
 
     }
 
+
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (v == this.panel) {
-            float xPos = event.getX();
-            float yPos = event.getY();
-            if (this.lock == false) {
-                this.xPoint = xPos;
-                this.lock = true;
-            }
-
-            int action = event.getAction();
-
-            switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                case MotionEvent.ACTION_MOVE:
-                    break;
-                case MotionEvent.ACTION_UP:
-                    Log.i("yPoint",String.valueOf(this.xPoint));
-                    this.lock = false;
-                    if (xPoint> xPos) {
-                        myCanvas = findViewById(R.id.drawing_view);
-                        myCanvas.clearScreen();
-                    }else if (xPoint < xPos) {
-                        myCanvas = findViewById(R.id.drawing_view);
-                        myCanvas.recognizeScreen();
-                        myCanvas.clearScreen();
-
-                    }
-            }
+    public void onClick(View v) {
+        if (v == this.voice) {
+            Intent myIntent = new Intent(MainActivity.this, VoiceActivity.class);
+            startActivity(myIntent);
         }
-        return true;
+        else if (v == this.game) {
+            Intent myIntent = new Intent(MainActivity.this, GameActivity.class);
+            startActivity(myIntent);
+        }
     }
 }

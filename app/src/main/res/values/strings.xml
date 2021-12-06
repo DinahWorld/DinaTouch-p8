@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">DinaWrite</string>
     <string name="textview">TextView</string>
+    <string name="voix">voix</string>
+    <string name="recherche">Recherche</string>
+    <string name="game">game</string>
+    <string name="todo">TODO</string>
 </resources>

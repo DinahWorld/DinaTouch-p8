@@ -59,7 +59,6 @@ public class WriteToText extends View {
         paint.setStrokeWidth(5f);
         strokeBuilder = Ink.Stroke.builder();
         metrics = context.getResources().getDisplayMetrics();
-        posX = metrics.widthPixels /2;
         posY = metrics.heightPixels /2;
 
         // On spécifie quelle langue on veut pour la reconnaissance du texte
@@ -101,7 +100,7 @@ public class WriteToText extends View {
     protected void onDraw(Canvas canvas){
         this.paint.setColor(Color.parseColor("#FFFFFF"));
         this.paint.setTextSize(50);
-        canvas.drawText(this.text,this.posX , this.posY, paint);
+        canvas.drawText(this.text,0, this.posY, paint);
 
         super.onDraw(canvas);
         canvas.drawPath(path,paint);

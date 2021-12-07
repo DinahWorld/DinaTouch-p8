@@ -17,12 +17,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/searchText"
+                android:paddingBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#BBDEFB" />
+
+            <ImageButton
+                android:id="@+id/searchBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:srcCompat="@drawable/googleg_standard_color_18"
+                tools:ignore="SpeakableTextPresentCheck"
+                android:contentDescription="@string/searchbtn" />
+        </LinearLayout>
+
         <com.example.dinawrite.WriteToText
             android:id="@+id/drawing_view"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_weight="9"
-            android:background="@drawable/layout_activity" />
+            android:background="@drawable/layout_bg_white" />
 
         <LinearLayout
             android:layout_width="match_parent"

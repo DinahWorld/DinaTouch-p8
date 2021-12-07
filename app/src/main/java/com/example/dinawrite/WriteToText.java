@@ -27,7 +27,7 @@ import com.google.mlkit.vision.digitalink.Ink;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public class WriteToSpeech extends View {
+public class WriteToText extends View {
     Paint paint;
     Path path;
     public Ink.Builder inkBuilder = Ink.builder();
@@ -37,14 +37,14 @@ public class WriteToSpeech extends View {
     public TextToSpeech textToSpeech;
     public RemoteModelManager remoteModelManager;
     DigitalInkRecognitionModelIdentifier modelIdentifier;
-
+    public String text = "";
     // check si on a téléchargé le model
     public Task<Boolean> checkIsDownload;
 
-    public WriteToSpeech(Context context){
+    public WriteToText(Context context){
         this(context, null);
     }
-    public WriteToSpeech(Context context, AttributeSet attrs) {
+    public WriteToText(Context context, AttributeSet attrs) {
         super(context,attrs);
         paint = new Paint();
         path = new Path();
@@ -57,7 +57,7 @@ public class WriteToSpeech extends View {
         paint.setStrokeWidth(5f);
         strokeBuilder = Ink.Stroke.builder();
 
-
+        // On spécifie quelle langue on veut pour la reconnaissance du texte
         try {
             modelIdentifier =
                     DigitalInkRecognitionModelIdentifier.fromLanguageTag("fr");
@@ -71,11 +71,9 @@ public class WriteToSpeech extends View {
         remoteModelManager = RemoteModelManager.getInstance();
         model = DigitalInkRecognitionModel.builder(modelIdentifier).build();
         downloadModel();
-        //checkIsDownload = remoteModelManager.isModelDownloaded(model);
-        //checkIfModelIfDownloaded();
 
-
-        // Get a recognizer for the language
+        // Un attribut qui nous permettre de reconnaitre
+        // le texte pour la langue demandé
         recognizer =
                 DigitalInkRecognition.getClient(
                         DigitalInkRecognizerOptions.builder(model).build());
@@ -93,19 +91,15 @@ public class WriteToSpeech extends View {
     }
 
 
-
-    public void checkIfModelIfDownloaded(){
-        checkIsDownload.addOnSuccessListener(
-                i -> Log.i(TAG, "Déjà téléchargé"))
-                .addOnFailureListener(
-                        aVoid -> {
-                            downloadModel();
-                        }
-                        );
-
+    /// Methode qui dessine nos tracé
+    @Override
+    protected void onDraw(Canvas canvas){
+        super.onDraw(canvas);
+        canvas.drawPath(path,paint);
     }
 
-    /// Méthode qui check si on possède un model
+
+    /// Méthode qui va télécharger toute les ressources nécessaire pour l'utilisation de l'API
     public void downloadModel(){
         this.remoteModelManager
                 .download(model, new DownloadConditions.Builder().build())
@@ -114,83 +108,70 @@ public class WriteToSpeech extends View {
                         e -> Log.e(TAG, "Erreur durant le téléchargement du model" + e));
     }
 
-    @Override
-    protected void onDraw(Canvas canvas){
-        super.onDraw(canvas);
-        canvas.drawPath(path,paint);
-    }
 
+    /// Methode qui recuperer la position de notre doigt afin de dessiner les lignes
+    /// et de construire notre strokeBuilder qui va contenir les tracé afin de pouvoir
+    /// reconnaitre le texte
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float xPos = event.getX();
         float yPos = event.getY();
+        long t = System.currentTimeMillis();
+        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds((t));
 
         int action = event.getAction();
         switch(action){
             case MotionEvent.ACTION_DOWN:
+                strokeBuilder.addPoint(Ink.Point.create(xPos, yPos, t));
                 path.moveTo(xPos,yPos);
                 return true;
             case MotionEvent.ACTION_MOVE:
+                strokeBuilder.addPoint(Ink.Point.create(xPos, yPos, t));
                 path.lineTo(xPos,yPos);
                 break;
             case MotionEvent.ACTION_UP:
+                strokeBuilder.addPoint(Ink.Point.create(xPos, yPos, t));
                 break;
             default:
                 return false;
         }
-        addNewTouchEvent(event);
         invalidate();
         return true;
     }
-    // Call this each time there is a new event.
-    public void addNewTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        long t = System.currentTimeMillis();
-        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds((t));
 
 
-        int action = event.getActionMasked();
-        switch (action) {
-            // Lorsqu'on écrit à la main on ajoute les coordonnées des points du texte
-            // à notre strokeBuilder
-            case MotionEvent.ACTION_DOWN:
-                strokeBuilder.addPoint(Ink.Point.create(x, y, t));
-                break;
-            case MotionEvent.ACTION_MOVE:
-                strokeBuilder.addPoint(Ink.Point.create(x, y, t));
-                break;
-            case MotionEvent.ACTION_UP:
-                // Lorsque l'utilisateur va enlever son doigt de l'écran, on appelle nos
-                // méthodes qui vont reconnaitre le
-                this.strokeBuilder.addPoint(Ink.Point.create(x, y, t));
-                break;
-        }
-    }
-    // On efface l'écran
+    /// Méthode pour effacer l'écran
     public void clearScreen(){
         path.reset();
         inkBuilder = Ink.builder();
         strokeBuilder = Ink.Stroke.builder();
+        //On redessine notre écran
+        invalidate();
+
     }
+
+    /// Méthode pour reconnaitre ce qu'on a écrit
     public void recognizeScreen(){
         this.inkBuilder.addStroke(this.strokeBuilder.build());
         // This is what to send to the recognizer.
         Ink ink = inkBuilder.build();
         this.recognizer.recognize(ink)
                 .addOnSuccessListener(
-                        // `result` contains the recognizer's answers as a RecognitionResult.
-                        // Logs the text from the top candidate.
-
+                        // Contient notre texte reconnu
                         result -> {
-                            Log.i(TAG, result.getCandidates().get(0).getText(),null);
+                            this.text = result.getCandidates().get(0).getText();
+                            Log.i(TAG, this.text,null);
 
-                            String text = result.getCandidates().get(0).getText();
-                            this.textToSpeech.speak(text,TextToSpeech.QUEUE_FLUSH,null);
+                            this.textToSpeech.speak(this.text,TextToSpeech.QUEUE_FLUSH,null);
                         })
-
                 .addOnFailureListener(
                         e -> Log.e(TAG, "Error during recognition: " + e));
+
+    }
+
+    /// Getter pour récuperer le texte
+    public String getText(){
+        return this.text;
     }
 
 }

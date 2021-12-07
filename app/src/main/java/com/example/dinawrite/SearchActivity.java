@@ -2,29 +2,42 @@ package com.example.dinawrite;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class VoiceActivity extends AppCompatActivity implements View.OnTouchListener {
-    WriteToText WriteToText;
+public class SearchActivity extends AppCompatActivity implements View.OnTouchListener, View.OnClickListener {
+    WriteToText WriteToSearch;
+    ImageButton searchBtn;
     TextView navigation;
+    TextView searchText;
     Boolean lock;
     float xPoint;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //myCanvas = new myCanvas(this,null);
-        setContentView(R.layout.write_to_speech);
+        setContentView(R.layout.activity_search);
         navigation = findViewById(R.id.panel);
+        searchBtn = findViewById(R.id.searchBtn);
+        searchText = findViewById(R.id.searchText);
+
         lock = false;
-
         navigation.setOnTouchListener(this);
+        searchBtn.setOnClickListener(this);
+    }
 
+    @Override
+    public void onClick(View v) {
+        if(v == this.searchBtn){
+            //On ouvre une fenetre qui va nous permetre de rechercher le texte entré
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=" + searchText.getText())));
+        }
     }
 
     @Override
@@ -48,14 +61,17 @@ public class VoiceActivity extends AppCompatActivity implements View.OnTouchList
                     this.lock = false;
                     // On efface l'écran et on revient sur l'écran de menu
                     if (xPoint> xPos) {
-                        WriteToText = findViewById(R.id.drawing_view);
-                        WriteToText.clearScreen();
+                        WriteToSearch = findViewById(R.id.drawing_view);
+                        WriteToSearch.clearScreen();
                         finish();
-                    }// On reconnait ce que l'utilisateur a écrit
+                    }// On reconnait ce que l'utilisateur a écrit puis on l'ajoute au textView
                     else if (xPoint < xPos) {
-                        WriteToText = findViewById(R.id.drawing_view);
-                        WriteToText.recognizeScreen();
-                        WriteToText.clearScreen();
+                        WriteToSearch = findViewById(R.id.drawing_view);
+                        WriteToSearch.recognizeScreen();
+                        //On remet à jour notre attrinut pour qu'il recupere le texte
+                        String text = WriteToSearch.getText() + " ";
+                        this.searchText.append(text);
+                        WriteToSearch.clearScreen();
 
                     }
             }

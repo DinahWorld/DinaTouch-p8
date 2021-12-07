@@ -22,9 +22,14 @@
             android:exported="true">
         </activity>
         <activity
+            android:name=".SearchActivity"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".GameActivity"
             android:exported="true">
         </activity>
+
 
     </application>
 

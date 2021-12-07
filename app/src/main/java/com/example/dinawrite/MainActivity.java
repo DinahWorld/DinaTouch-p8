@@ -10,15 +10,19 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     Button voice;
     Button game;
+    Button search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.activity_menu);
         voice = findViewById(R.id.voice);
         game = findViewById(R.id.game);
+        search = findViewById(R.id.search);
+
         voice.setOnClickListener(this);
         game.setOnClickListener(this);
+        search.setOnClickListener(this);
 
     }
 
@@ -31,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if (v == this.game) {
             Intent myIntent = new Intent(MainActivity.this, GameActivity.class);
+            startActivity(myIntent);
+        }
+        else if (v == this.search) {
+            Intent myIntent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(myIntent);
         }
     }

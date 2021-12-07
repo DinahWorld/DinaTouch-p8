@@ -175,6 +175,7 @@ public class WriteToText extends View {
                 .addOnFailureListener(
                         e -> Log.e(TAG, "Error during recognition: " + e));
 
+        invalidate();
     }
 
     /// Getter pour récuperer le texte

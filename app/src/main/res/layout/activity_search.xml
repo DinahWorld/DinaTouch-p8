@@ -71,9 +71,9 @@
             android:layout_marginLeft="20dp"
             android:layout_marginBottom="20dp"
             android:id="@+id/imageView3"
-            android:layout_width="25dp"
+            android:layout_width="80dp"
             android:layout_height="25dp"
-            app:srcCompat="@drawable/swipe_left"
+            app:srcCompat="@drawable/swipe_left_swipe"
             android:scaleType="fitXY"/>
     </RelativeLayout>
 
@@ -86,9 +86,9 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="20dp"
             android:id="@+id/imageView4"
-            android:layout_width="25dp"
+            android:layout_width="80dp"
             android:layout_height="25dp"
-            app:srcCompat="@drawable/swipe_right"
+            app:srcCompat="@drawable/swipe_right_swipe"
             android:scaleType="fitXY"/>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

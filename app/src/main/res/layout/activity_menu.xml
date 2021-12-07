@@ -8,6 +8,17 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/logo" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
 
@@ -24,16 +35,18 @@
                 android:layout_marginRight="10dp"
                 android:background="@android:color/transparent"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/_048" />
+                app:srcCompat="@drawable/_048"
+                tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
 
             <ImageButton
                 android:id="@+id/btnVoice"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:layout_marginRight="10dp"
                 android:background="@android:color/transparent"
                 android:scaleType="fitXY"
-                android:layout_marginRight="10dp"
-                app:srcCompat="@drawable/voix" />
+                app:srcCompat="@drawable/voix"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <ImageButton
                 android:id="@+id/btnSearch"
@@ -41,11 +54,25 @@
                 android:layout_height="100dp"
                 android:background="@android:color/transparent"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/recherche" />
+                app:srcCompat="@drawable/recherche"
+                tools:ignore="SpeakableTextPresentCheck" />
         </LinearLayout>
 
 
+    </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom|center">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/layout_bg"
+            android:text="Retour" />
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
     ImageButton voice;
     ImageButton game;
     ImageButton search;
+    Button back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,11 +21,12 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         voice = findViewById(R.id.btnVoice);
         game = findViewById(R.id.btnGame);
         search = findViewById(R.id.btnSearch);
+        back = findViewById(R.id.btnBack);
 
         voice.setOnClickListener(this);
         game.setOnClickListener(this);
         search.setOnClickListener(this);
-
+        back.setOnClickListener(this);
     }
 
 
@@ -41,6 +43,9 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         else if (v == this.search) {
             Intent myIntent = new Intent(MenuActivity.this, SearchActivity.class);
             startActivity(myIntent);
+        }
+        else if (v == this.back){
+            finish();
         }
     }
 }

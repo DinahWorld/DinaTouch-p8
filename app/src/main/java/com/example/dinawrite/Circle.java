@@ -56,9 +56,9 @@ public class Circle {
         return this.number.equals("0") ? true : false;
     }
     public void addNumber(int n){
-        this.r = 84;
-        this.g = 81;
-        this.b = 168;
+        this.r = 61;
+        this.g = 178;
+        this.b = 255;
         this.show = true;
         this.number = String.valueOf(n);
 
@@ -97,9 +97,9 @@ public class Circle {
         this.number = String.valueOf(Integer.parseInt(this.number) * 2);
         if (Integer.parseInt(this.number) != 4) {
             //Seuls les nombres apres 4 auront une modification des couleurs
-            this.r += 20;
-            this.g += 20;
-            this.b += 5;
+            this.r += 10;
+            this.g -= 10;
+            this.b -= 10;
         }
         this.score = String.valueOf(Integer.parseInt(this.score) + Integer.parseInt(this.number));
         this.changed = true;

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="#5451A8">
+    tools:context=".MenuActivity"
+    android:background="#00102a">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="#BBDEFB" />
+                android:textColor="#FFFFFF" />
 
             <ImageButton
                 android:id="@+id/searchBtn"
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_weight="9"
-            android:background="@drawable/layout_bg_white" />
+            android:background="@drawable/layout_bg" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,4 +62,33 @@
         </LinearLayout>
 
     </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom|left">
+
+        <ImageView
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/imageView3"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:srcCompat="@drawable/swipe_left"
+            android:scaleType="fitXY"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom|right">
+
+        <ImageView
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/imageView4"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            app:srcCompat="@drawable/swipe_right"
+            android:scaleType="fitXY"/>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

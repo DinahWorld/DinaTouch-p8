@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -15,7 +14,6 @@ import java.util.Random;
 
 public class Game extends View {
     Paint paint;
-    Path path;
     DisplayMetrics metrics;
     int[] x ;
     int y;
@@ -25,7 +23,7 @@ public class Game extends View {
     int nbreColl = 4;
     boolean lock;
     //Attribut qui va compter chaque case remplie
-    public int verif;
+    public int verify;
     public float xPoint;
     public float yPoint;
     public int textSize;
@@ -48,7 +46,7 @@ public class Game extends View {
         this.x = new int[]{bloc,bloc*2,bloc*3,bloc*4};
         this.radius = (this.x[1] - this.x[0]) /2;
         this.y = metrics.heightPixels/4;
-        verif = 0;
+        verify = 0;
 
         this.circle = new Circle(-1,2,radius);
 
@@ -93,6 +91,8 @@ public class Game extends View {
                         this.movBas();
                     }else if(yPoint - 200 > yPos){
                         this.movHaut();
+                    }else{
+                        break;
                     }
                     this.drawRandomCase(1);
                 }
@@ -106,9 +106,12 @@ public class Game extends View {
     @Override
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
-        this.paint.setColor(Color.parseColor("#3833c4"));
+        this.paint.setColor(Color.parseColor("#FFFFFF"));
         this.paint.setTextSize(this.textSize);
         canvas.drawText("2048", this.textX , this.textY, paint);
+        this.paint.setTextSize(this.textSize/3);
+        canvas.drawText("score", 0, this.textY/2, paint);
+        canvas.drawText(circle.score, 0, this.textY, paint);
 
         for(int i = 0;i < 4;i++){
             for(int j = 0;j< 4;j++){
@@ -262,7 +265,7 @@ public class Game extends View {
                     circles[y + y2][x + x2].multNumber();
                     circles[y + y2][x + x2].radius *= 1.2;
                     circles[y][x].resetCircle();
-                    verif -= 1;
+                    verify -= 1;
 
 
                 } else {
@@ -286,9 +289,9 @@ public class Game extends View {
     }
 
     public void drawRandomCase(int limit){
-        int numberOfCase = circles[0][0].numberOfCase;
+        int numberOfCase = circle.numberOfCase;
         Log.i("TAG",String.valueOf(numberOfCase));
-        if(verif != 4*4){
+        if(verify != 4*4){
             Random rand = new Random();
             int n = 0;
 
@@ -310,7 +313,7 @@ public class Game extends View {
                     circles[randomPos_y][randomPos_x].radius *= 1.2;
                     circles[0][0].numberOfCase += 1;
                     n += 1;
-                    verif += 1;
+                    verify += 1;
                     /*
                      * Si l'attribut verif est égales aux nombres de cases du jeu
                      * On regarde s'il existe un mouvement disponible

@@ -34,6 +34,7 @@ public class Circle {
         this.radius = radius;
         this.initialRadius = radius;
         this.show = false;
+        this.score = "0";
     }
 
     public void drawCase(Canvas canvas){

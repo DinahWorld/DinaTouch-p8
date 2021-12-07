@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class SearchActivity extends AppCompatActivity implements View.OnTouchListener, View.OnClickListener {
-    WriteToText WriteToSearch;
+    WriteToText writeToSearch;
     ImageButton searchBtn;
     TextView navigation;
     TextView searchText;
@@ -36,6 +36,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnTouchLis
     public void onClick(View v) {
         if(v == this.searchBtn){
             //On ouvre une fenetre qui va nous permetre de rechercher le texte entré
+            writeToSearch = findViewById(R.id.drawing_view);
+            String text = writeToSearch.getText();
+            searchText.setText(text);
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=" + searchText.getText())));
         }
     }
@@ -61,17 +64,15 @@ public class SearchActivity extends AppCompatActivity implements View.OnTouchLis
                     this.lock = false;
                     // On efface l'écran et on revient sur l'écran de menu
                     if (xPoint> xPos) {
-                        WriteToSearch = findViewById(R.id.drawing_view);
-                        WriteToSearch.clearScreen();
+                        writeToSearch = findViewById(R.id.drawing_view);
+                        writeToSearch.clearScreen();
                         finish();
                     }// On reconnait ce que l'utilisateur a écrit puis on l'ajoute au textView
                     else if (xPoint < xPos) {
-                        WriteToSearch = findViewById(R.id.drawing_view);
-                        WriteToSearch.recognizeScreen();
+                        writeToSearch = findViewById(R.id.drawing_view);
+                        writeToSearch.recognizeScreen();
                         //On remet à jour notre attrinut pour qu'il recupere le texte
-                        String text = WriteToSearch.getText() + " ";
-                        this.searchText.append(text);
-                        WriteToSearch.clearScreen();
+                        writeToSearch.clearScreen();
 
                     }
             }

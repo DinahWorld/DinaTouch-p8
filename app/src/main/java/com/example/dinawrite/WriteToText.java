@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,10 +37,11 @@ public class WriteToText extends View {
     public DigitalInkRecognizer recognizer;
     public TextToSpeech textToSpeech;
     public RemoteModelManager remoteModelManager;
-    DigitalInkRecognitionModelIdentifier modelIdentifier;
+    public DigitalInkRecognitionModelIdentifier modelIdentifier;
     public String text = "";
-    // check si on a téléchargé le model
-    public Task<Boolean> checkIsDownload;
+    public int posX;
+    public int posY;
+    public DisplayMetrics metrics;
 
     public WriteToText(Context context){
         this(context, null);
@@ -56,6 +58,9 @@ public class WriteToText extends View {
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeWidth(5f);
         strokeBuilder = Ink.Stroke.builder();
+        metrics = context.getResources().getDisplayMetrics();
+        posX = metrics.widthPixels /2;
+        posY = metrics.heightPixels /2;
 
         // On spécifie quelle langue on veut pour la reconnaissance du texte
         try {
@@ -94,6 +99,10 @@ public class WriteToText extends View {
     /// Methode qui dessine nos tracé
     @Override
     protected void onDraw(Canvas canvas){
+        this.paint.setColor(Color.parseColor("#FFFFFF"));
+        this.paint.setTextSize(50);
+        canvas.drawText(this.text,this.posX , this.posY, paint);
+
         super.onDraw(canvas);
         canvas.drawPath(path,paint);
     }
@@ -159,10 +168,10 @@ public class WriteToText extends View {
                 .addOnSuccessListener(
                         // Contient notre texte reconnu
                         result -> {
-                            this.text = result.getCandidates().get(0).getText();
-                            Log.i(TAG, this.text,null);
-
-                            this.textToSpeech.speak(this.text,TextToSpeech.QUEUE_FLUSH,null);
+                            String word = result.getCandidates().get(0).getText();
+                            Log.i(TAG, word,null);
+                            this.text += word + " ";
+                            this.textToSpeech.speak(word,TextToSpeech.QUEUE_FLUSH,null);
                         })
                 .addOnFailureListener(
                         e -> Log.e(TAG, "Error during recognition: " + e));
